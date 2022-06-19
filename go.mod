@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/google/go-querystring v1.1.0
+	github.com/overseedio/realtime-go v0.0.0
 	github.com/supabase-community/storage-go v0.5.7
 	github.com/supabase/postgrest-go v0.0.7
 )

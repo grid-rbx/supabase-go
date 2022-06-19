@@ -4,12 +4,12 @@ Unofficial [Supabase](https://supabase.io) client for Go. It is an amalgamation 
 
 ## Installation
 ```
-go get github.com/nedpals/supabase-go
+go get github.com/grid-rbx/supabase-go
 ```
 
 ## Usage
 ```golang
-import supabase "github.com/nedpals/supabase-go"
+import supabase "github.com/grid-rbx/supabase-go"
 
 func main() {
   supabaseUrl := "<SUPABASE-URL>"
@@ -33,14 +33,26 @@ func main() {
   }
 
   fmt.Println(results)
+
+  // Storage
+  supabaseClient.Storage.UploadFile("bucket-name", "file.txt", file)
+
+  // Realtime
+  supabaseClient.Realtime.Connect()
+
+  channel, err := supabaseClient.Realtime.Channel(supabaseClient.Realtime.WithTable("realtime", "public", "my_table"))
+
+  channel.OnInsert = func(m supabaseClient.Realtime.Message) {
+    fmt.Println(m)
+  }
 }
 ```
 
 ## Roadmap
 - [x] Auth support (1)
 - [x] DB support (2)
-- [ ] Realtime
-- [ ] Storage
+- [x] Realtime
+- [x] Storage
 - [ ] Testing
 
 (1) - Thin API wrapper. Does not rely on the GoTrue library for simplicity
@@ -53,7 +65,7 @@ It tries to mimick as much as possible the official Javascript client library in
 
 # Contributing
 ## Submitting a pull request
-- Fork it (https://github.com/nedpals/supabase-go/fork)
+- Fork it (https://github.com/grid-rbx/supabase-go/fork)
 - Create your feature branch (git checkout -b my-new-feature)
 - Commit your changes (git commit -am 'Add some feature')
 - Push to the branch (git push origin my-new-feature)
@@ -61,3 +73,6 @@ It tries to mimick as much as possible the official Javascript client library in
 
 # Contributors
 - [nedpals](https://github.com/nedpals) - creator and maintainer
+- [dominictwlee](https://github.com/dominictwlee) - supabase-community/postgrest-go implementation
+- [cursecodes](https://github.com/cursecodes) - storage implementation
+- [overseedio](https://github.com/overseedio) - realtime implementation

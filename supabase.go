@@ -9,14 +9,16 @@ import (
 	"net/url"
 	"time"
 
+	realtime_go "github.com/overseedio/realtime-go"
 	storage_go "github.com/supabase-community/storage-go"
 	"github.com/supabase/postgrest-go"
 )
 
 const (
-	AuthEndpoint    = "auth/v1"
-	RestEndpoint    = "rest/v1"
-	StorageEndpoint = "storage/v1"
+	AuthEndpoint     = "auth/v1"
+	RestEndpoint     = "rest/v1"
+	StorageEndpoint  = "storage/v1"
+	RealtimeEndpoint = "websocket"
 )
 
 type Client struct {
@@ -26,6 +28,7 @@ type Client struct {
 	HTTPClient *http.Client
 	Auth       *Auth
 	Storage    *storage_go.Client
+	Realtime   *realtime_go.Client
 	DB         *postgrest.Client
 }
 
@@ -54,12 +57,18 @@ func CreateClient(baseURL string, supabaseKey string, debug ...bool) *Client {
 	dbClient.TokenAuth(supabaseKey)
 
 	storage := storage_go.NewClient(fmt.Sprintf("%s/%s/", baseURL, StorageEndpoint), supabaseKey, nil)
+	realtime, realtimeErr := realtime_go.NewClient(fmt.Sprintf("%s/%s/", baseURL, RealtimeEndpoint), supabaseKey)
+
+	if realtimeErr != nil {
+		panic(realtimeErr)
+	}
 
 	client := &Client{
-		BaseURL: baseURL,
-		apiKey:  supabaseKey,
-		Auth:    &Auth{},
-		Storage: storage,
+		BaseURL:  baseURL,
+		apiKey:   supabaseKey,
+		Auth:     &Auth{},
+		Storage:  storage,
+		Realtime: realtime,
 		HTTPClient: &http.Client{
 			Timeout: time.Minute,
 		},
