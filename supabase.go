@@ -7,12 +7,14 @@ import (
 	"net/url"
 	"time"
 
-	postgrest "github.com/nedpals/postgrest-go/pkg"
+	storage_go "github.com/supabase-community/storage-go"
+	"github.com/supabase/postgrest-go"
 )
 
 const (
-	AuthEndpoint = "auth/v1"
-	RestEndpoint = "rest/v1"
+	AuthEndpoint    = "auth/v1"
+	RestEndpoint    = "rest/v1"
+	StorageEndpoint = "storage/v1"
 )
 
 type Client struct {
@@ -21,6 +23,7 @@ type Client struct {
 	apiKey     string
 	HTTPClient *http.Client
 	Auth       *Auth
+	Storage    *storage_go.Client
 	DB         *postgrest.Client
 }
 
@@ -39,24 +42,26 @@ func CreateClient(baseURL string, supabaseKey string, debug ...bool) *Client {
 	if err != nil {
 		panic(err)
 	}
+
+	dbClient := postgrest.NewClient(
+		parsedURL.String(),
+		"",
+		nil,
+	)
+
+	dbClient.TokenAuth(supabaseKey)
+
+	storage := storage_go.NewClient(fmt.Sprintf("%s/%s/", baseURL, StorageEndpoint), supabaseKey, nil)
+
 	client := &Client{
 		BaseURL: baseURL,
 		apiKey:  supabaseKey,
 		Auth:    &Auth{},
+		Storage: storage,
 		HTTPClient: &http.Client{
 			Timeout: time.Minute,
 		},
-		DB: postgrest.NewClient(
-			*parsedURL,
-			postgrest.WithTokenAuth(supabaseKey),
-			func(c *postgrest.Client) {
-				// debug parameter is only for postgrest-go for now
-				if len(debug) > 0 {
-					c.Debug = debug[0]
-				}
-				c.AddHeader("apikey", supabaseKey)
-			},
-		),
+		DB: dbClient,
 	}
 	client.Auth.client = client
 	return client
