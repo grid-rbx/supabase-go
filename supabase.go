@@ -1,5 +1,7 @@
 package supabase
 
+// supabase-go
+
 import (
 	"encoding/json"
 	"fmt"
