@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
+
 	"fmt"
 	"net/http"
 	"time"
@@ -86,7 +86,7 @@ func (a *Auth) SignIn(ctx context.Context, credentials UserCredentials) (*Authen
 	if err != nil {
 		return nil, err
 	} else if hasCustomError {
-		return nil, errors.New(fmt.Sprintf("%s: %s", errRes.Error, errRes.ErrorDescription))
+		return nil, fmt.Errorf(fmt.Sprintf("%s: %s", errRes.Error, errRes.ErrorDescription))
 	}
 
 	return &res, nil
@@ -109,7 +109,7 @@ func (a *Auth) RefreshUser(ctx context.Context, userToken string, refreshToken s
 	if err != nil {
 		return nil, err
 	} else if hasCustomError {
-		return nil, errors.New(fmt.Sprintf("%s: %s", errRes.Error, errRes.ErrorDescription))
+		return nil, fmt.Errorf(fmt.Sprintf("%s: %s", errRes.Error, errRes.ErrorDescription))
 	}
 
 	return &res, nil
@@ -129,7 +129,7 @@ func (a *Auth) SendMagicLink(ctx context.Context, email string) error {
 	if err != nil {
 		return err
 	} else if hasCustomError {
-		return errors.New(fmt.Sprintf("%s", errRes.Message))
+		return fmt.Errorf(errRes.Message)
 	}
 
 	return nil
@@ -175,7 +175,7 @@ func (a *Auth) User(ctx context.Context, userToken string) (*User, error) {
 	if err != nil {
 		return nil, err
 	} else if hasCustomError {
-		return nil, errors.New(fmt.Sprintf("%s", errRes.Message))
+		return nil, fmt.Errorf(errRes.Message)
 	}
 
 	return &res, nil
@@ -199,7 +199,7 @@ func (a *Auth) UpdateUser(ctx context.Context, userToken string, updateData map[
 	if err != nil {
 		return nil, err
 	} else if hasCustomError {
-		return nil, errors.New(fmt.Sprintf("%s", errRes.Message))
+		return nil, fmt.Errorf(errRes.Message)
 	}
 
 	return &res, nil
